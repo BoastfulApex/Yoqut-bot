@@ -23,8 +23,6 @@ WEBHOOK_URL = f"https://{WEBHOOK_HOST}:{PORT}{WEBHOOK_PATH}"
 WEBAPP_HOST = "0.0.0.0"  # or ip
 WEBAPP_PORT = 5432
 
-
-
 I18N_DOMAIN = 'testbot'
 BASE_DIR = Path(__file__).parent.parent
 LOCALES_DIR = BASE_DIR / 'locales'

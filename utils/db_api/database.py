@@ -1,8 +1,6 @@
 from typing import List, Any
 from asgiref.sync import sync_to_async
-from backend.models import User, Product, ProductCategory, CartModel
-from about_us.models import FaqModel, PriceListModel, VideoModel, SerificateModel, PhotoModel, About
-
+from backend.models import User
 
 @sync_to_async
 def add_user(user_id, name, phone, email, lang):
@@ -58,120 +56,120 @@ def get_lang(user_id):
     except:
         "en"
 
-
-@sync_to_async
-def get_categories() -> List[Product]:
-    items = Product.objects.distinct("category_name")
-    return items
-
-
-@sync_to_async
-def get_category_by_name(category_name) -> List[ProductCategory]:
-    category = ProductCategory.objects.get(category_name=category_name)
-    return category
-
-
-@sync_to_async
-def get_items(category) -> List[Product]:
-    return Product.objects.all().filter(category_code=category).all()
-
-
-@sync_to_async
-def get_item(item_id) -> Product:
-    item = Product.objects.filter(id=int(item_id)).first()
-    return item
-
-
-@sync_to_async
-def get_purchase(user) -> List[CartModel]:
-    try:
-        purchase = CartModel.objects.filter(user=user, is_success=False).order_by("-id")
-        return purchase
-    except:
-        pass
-
-
-@sync_to_async
-def get_purchase_by_id(purchase_id):
-    try:
-        purchase = CartModel.objects.get(id=purchase_id)
-        return purchase
-    except:
-        pass
-
-
-@sync_to_async
-def delete_purchase(purchase_id):
-    purchase = CartModel.objects.get(id=purchase_id)
-    purchase.delete()
-
-
-@sync_to_async
-def update_purchase(buyer):
-    purchase = False
-    purchases = CartModel.objects.filter(user=buyer).all()
-    for purchase in purchases:
-        purchase.is_success = True
-        purchase.save()
-
-    return purchase
-
-
-@sync_to_async
-def get_about_us():
-    try:
-        about_us = About.objects.all().order_by("-id")[0]
-        return about_us
-    except Exception as err:
-        print(err)
-        return None
-        pass
-
-
-@sync_to_async
-def get_faq():
-    try:
-        faq = FaqModel.objects.all().order_by("-id")[0]
-        return faq
-    except Exception as err:
-        print(err)
-        return None
-        pass
-
-
-@sync_to_async
-def get_price_list():
-    try:
-        price_list = PriceListModel.objects.all().order_by("-id")[0]
-        return price_list
-    except Exception as err:
-        print(err)
-        return None
-        pass
-
-
-@sync_to_async
-def get_videos():
-    try:
-        videos = VideoModel.objects.all().order_by("-id")
-        return videos
-    except:
-        return None
-
-
-@sync_to_async
-def get_photos():
-    try:
-        photos = PhotoModel.objects.all().order_by("-id")
-        return photos
-    except:
-        return None
-
-
-@sync_to_async
-def get_certificate():
-    try:
-        certificates = SerificateModel.objects.all().order_by("-id")
-        return certificates
-    except:
-        return None
+#
+# @sync_to_async
+# def get_categories() -> List[Product]:
+#     items = Product.objects.distinct("category_name")
+#     return items
+#
+#
+# @sync_to_async
+# def get_category_by_name(category_name) -> List[ProductCategory]:
+#     category = ProductCategory.objects.get(category_name=category_name)
+#     return category
+#
+#
+# @sync_to_async
+# def get_items(category) -> List[Product]:
+#     return Product.objects.all().filter(category_code=category).all()
+#
+#
+# @sync_to_async
+# def get_item(item_id) -> Product:
+#     item = Product.objects.filter(id=int(item_id)).first()
+#     return item
+#
+#
+# @sync_to_async
+# def get_purchase(user) -> List[CartModel]:
+#     try:
+#         purchase = CartModel.objects.filter(user=user, is_success=False).order_by("-id")
+#         return purchase
+#     except:
+#         pass
+#
+#
+# @sync_to_async
+# def get_purchase_by_id(purchase_id):
+#     try:
+#         purchase = CartModel.objects.get(id=purchase_id)
+#         return purchase
+#     except:
+#         pass
+#
+#
+# @sync_to_async
+# def delete_purchase(purchase_id):
+#     purchase = CartModel.objects.get(id=purchase_id)
+#     purchase.delete()
+#
+#
+# @sync_to_async
+# def update_purchase(buyer):
+#     purchase = False
+#     purchases = CartModel.objects.filter(user=buyer).all()
+#     for purchase in purchases:
+#         purchase.is_success = True
+#         purchase.save()
+#
+#     return purchase
+#
+#
+# @sync_to_async
+# def get_about_us():
+#     try:
+#         about_us = About.objects.all().order_by("-id")[0]
+#         return about_us
+#     except Exception as err:
+#         print(err)
+#         return None
+#         pass
+#
+#
+# @sync_to_async
+# def get_faq():
+#     try:
+#         faq = FaqModel.objects.all().order_by("-id")[0]
+#         return faq
+#     except Exception as err:
+#         print(err)
+#         return None
+#         pass
+#
+#
+# @sync_to_async
+# def get_price_list():
+#     try:
+#         price_list = PriceListModel.objects.all().order_by("-id")[0]
+#         return price_list
+#     except Exception as err:
+#         print(err)
+#         return None
+#         pass
+#
+#
+# @sync_to_async
+# def get_videos():
+#     try:
+#         videos = VideoModel.objects.all().order_by("-id")
+#         return videos
+#     except:
+#         return None
+#
+#
+# @sync_to_async
+# def get_photos():
+#     try:
+#         photos = PhotoModel.objects.all().order_by("-id")
+#         return photos
+#     except:
+#         return None
+#
+#
+# @sync_to_async
+# def get_certificate():
+#     try:
+#         certificates = SerificateModel.objects.all().order_by("-id")
+#         return certificates
+#     except:
+#         return None

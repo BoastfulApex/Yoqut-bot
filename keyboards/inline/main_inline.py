@@ -5,6 +5,19 @@ from aiogram.utils.callback_data import CallbackData
 plus_minus_data = CallbackData("PS", "key", "purchase_id")
 
 
+async def menu_keyboard():
+    markup = InlineKeyboardMarkup(
+        inline_keyboard=[
+            InlineKeyboardButton(text=_("Tovar yaratish"), callback_data="add_product"),
+            InlineKeyboardButton(text=_("Skladga tovar olib kirish"), callback_data="add_to_storage"),
+            InlineKeyboardButton(text=_("Skladdagi tovarni sotish"), callback_data="sell_from_storage"),
+            InlineKeyboardButton(text=_("Sklad"), callback_data="storage"),
+        ]
+    )
+
+    return markup
+
+
 async def menu_button(lang):
     markup = InlineKeyboardMarkup(
         inline_keyboard=[
@@ -132,8 +145,6 @@ async def get_page_keyboard(max_pages: int, key, lang, page: int = 1):
     previous_page = page - 1
     previous_page_text = "⬅️"
 
-
-
     next_page = page + 1
     next_page_text = "➡️"
 
@@ -145,7 +156,6 @@ async def get_page_keyboard(max_pages: int, key, lang, page: int = 1):
                 callback_data=pagination_call.new(key=key, page=previous_page)
             )
         )
-
 
     if next_page <= max_pages:
         markup.insert(
@@ -163,8 +173,8 @@ async def get_page_keyboard(max_pages: int, key, lang, page: int = 1):
 
 back_button = InlineKeyboardMarkup(
     inline_keyboard=[
-            [
-                InlineKeyboardButton(text=_("◀️ Back"), callback_data="back_main"),
-            ]
+        [
+            InlineKeyboardButton(text=_("◀️ Back"), callback_data="back_main"),
+        ]
     ]
 )
