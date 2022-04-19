@@ -28,6 +28,9 @@ class User(models.Model):
 class Category(models.Model):
     category_name = models.CharField(max_length=25, null=True, blank=True)
 
+    def __str__(self):
+        return self.category_name
+
 
 class Product(models.Model):
     unique_name = models.CharField(max_length=50, null=True, blank=True, unique=True)
@@ -35,11 +38,17 @@ class Product(models.Model):
     chiqish_narxi = models.PositiveIntegerField(default=0)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
 
+    def __str__(self):
+        return self.unique_name
+
 
 class AddStorage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     count = models.PositiveIntegerField(default=0)
     date = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return self.product.unique_name
 
 
 class RemoveFrom(models.Model):

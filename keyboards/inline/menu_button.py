@@ -12,6 +12,7 @@ about_callback = CallbackData("about", "key", "item_id", "selected")
 
 pagination_about_call = CallbackData("paginator_about", "key", "page", "selected")
 
+
 def make_callback_data(level, category="0", item_id="0"):
     return menu_cd.new(level=level, category=category, item_id=item_id)
 
@@ -64,7 +65,8 @@ async def items_keyboard(category, lang):
 async def item_keyboard(category, item_id, selected, lang):
     CURRENT_LEVEL = 2
     markup = InlineKeyboardMarkup(row_width=3)
-    markup.insert(InlineKeyboardButton(text=_("Selected {} Ton", locale=lang).format(selected), callback_data="no_call"))
+    markup.insert(
+        InlineKeyboardButton(text=_("Selected {} Ton", locale=lang).format(selected), callback_data="no_call"))
     markup.row(InlineKeyboardButton(text=f"1",
                                     callback_data=select.new(key="num_choose", data="1", choosen_data=selected,
                                                              item_id=item_id)))
@@ -89,14 +91,13 @@ async def item_keyboard(category, item_id, selected, lang):
             text=_("🛒 Add to cart", locale=lang),
             callback_data=cart_callback.new(choosen_data=selected, item_id=item_id))
     )
-    print("ss",category, item_id)
+    print("ss", category, item_id)
     markup.row(
         InlineKeyboardButton(
-            text=_("◀️ Back",locale=lang),
+            text=_("◀️ Back", locale=lang),
             callback_data=make_callback_data(level=CURRENT_LEVEL - 1,
                                              category=category, item_id=item_id))
     )
-
 
     return markup
 
@@ -122,12 +123,11 @@ async def about_product_btn(item_id, selected, lang, max_pages: int, key, page: 
         markup.insert(
             InlineKeyboardButton(
                 text=next_page_text,
-                callback_data=pagination_about_call.new(key=key, page=next_page,selected=selected)
+                callback_data=pagination_about_call.new(key=key, page=next_page, selected=selected)
             )
         )
 
-    markup.row(InlineKeyboardButton(text=_("◀️ Back",locale=lang),
+    markup.row(InlineKeyboardButton(text=_("◀️ Back", locale=lang),
                                     callback_data=about_callback.new(key="back_product", item_id=item_id,
                                                                      selected=selected)))
     return markup
-

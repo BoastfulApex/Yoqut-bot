@@ -1,6 +1,7 @@
 from typing import List, Any
 from asgiref.sync import sync_to_async
-from backend.models import User
+from backend.models import *
+
 
 @sync_to_async
 def add_user(user_id, name, phone, email, lang):
@@ -20,21 +21,12 @@ def get_user(user_id: int):
 
 
 @sync_to_async
-def get_users() ->List[User]:
+def get_users() -> List[User]:
     try:
         users = User.objects.filter(is_admin="user").all()
         return users
     except Exception as err:
-        print("ERROR ->>>>",err)
-        return None
-
-
-@sync_to_async
-def get_admins():
-    try:
-        admins = User.objects.filter(is_admin="admin")
-        return admins
-    except:
+        print("ERROR ->>>>", err)
         return None
 
 
@@ -55,6 +47,88 @@ def get_lang(user_id):
             return "en"
     except:
         "en"
+
+
+@sync_to_async
+def get_categories() -> List[Category]:
+    try:
+        categories = Category.objects.all()
+        return categories
+    except Exception as err:
+        print("ERROR ->>>>", err)
+        return None
+
+
+@sync_to_async
+def add_product(unique_name, kirish_narxi, chiqish_narxi, category):
+    try:
+        return Product(unique_name=unique_name, kirish_narxi=kirish_narxi, chiqish_narxi=chiqish_narxi,
+                       category=category).save()
+    except Exception as err:
+        print(err)
+
+
+@sync_to_async
+def get_products() -> List[Product]:
+    try:
+        products = Product.objects.all()
+        return products
+    except Exception as err:
+        print("ERROR ->>>>", err)
+        return None
+
+
+@sync_to_async
+def get_category(id: int):
+    try:
+        category = Category.objects.filter(id=id).first()
+        return category
+    except:
+        return None
+
+
+@sync_to_async
+def get_product(id: int):
+    try:
+        category = Product.objects.filter(id=id).first()
+        return category
+    except:
+        return None
+
+
+@sync_to_async
+def add_Storage(product, count):
+    try:
+        return AddStorage(product=product, count=count).save()
+    except Exception as err:
+        print(err)
+
+
+@sync_to_async
+def get_storage() -> List[AddStorage]:
+    try:
+        storage = AddStorage.objects.all()
+        return storage
+    except Exception as err:
+        print("ERROR ->>>>", err)
+        return None
+
+
+@sync_to_async
+def get_storage_product(id: int):
+    try:
+        storage = AddStorage.objects.filter(id=id).first()
+        return storage
+    except:
+        return None
+
+
+@sync_to_async
+def sell_Storage(product, count):
+    try:
+        return AddStorage(product=product, count=count).save()
+    except Exception as err:
+        print(err)
 
 #
 # @sync_to_async
