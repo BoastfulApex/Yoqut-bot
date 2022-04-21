@@ -126,11 +126,29 @@ def get_storage_product(id: int):
 @sync_to_async
 def sell_Storage(product, count):
     try:
-        return AddStorage(product=product, count=count).save()
+        return RemoveFrom(product=product, count=count).save()
     except Exception as err:
         print(err)
 
-#
+
+@sync_to_async
+def sell_Storages_get() -> List[RemoveFrom]:
+    try:
+        storage = RemoveFrom.objects.all()
+        return storage
+    except Exception as err:
+        print("ERROR ->>>>", err)
+        return None
+
+
+@sync_to_async
+def get_by_serial(serial: str):
+    try:
+        storage = RemoveFrom.objects.filter(product__unique_name=serial)
+        return storage
+    except:
+        return None
+
 # @sync_to_async
 # def get_categories() -> List[Product]:
 #     items = Product.objects.distinct("category_name")

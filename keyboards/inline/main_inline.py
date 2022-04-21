@@ -61,6 +61,68 @@ async def storage_keyboard():
     return markup
 
 
+async def storage_menu():
+    markup = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text=_("Skladdagi tovarlarni ko'rish"), callback_data="products_in_storage")],
+            [InlineKeyboardButton(text=_("Shu hafta uchun savdoni ko'rish"), callback_data="sells_in_this_week")],
+            [InlineKeyboardButton(text=_("Oy uchun savdoni ko'rish"), callback_data="sells_in_month")],
+            [InlineKeyboardButton(text=_("Shu oy uchun savdoni ko'rish"), callback_data="sells_in_this_month")],
+            [InlineKeyboardButton(text=_("Tovar nomi bo'yicha savdoni ko'rish"), callback_data="sells_by_product")],
+            [InlineKeyboardButton(text=_("Kunlik savdoni ko'rish"), callback_data="sells_in_day")],
+            [InlineKeyboardButton(text=_("Kategoriya bo'yicha tovarlar"), callback_data="product_by_category")],
+            [InlineKeyboardButton(text=_("🔙 Orqaga"), callback_data=f"back_main")],
+        ]
+    )
+    return markup
+
+
+async def get_or_back():
+    markup = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text=_("🔙 Orqaga"), callback_data=f"back"),
+                InlineKeyboardButton(text=_("📑 Excell hujjatni yuklash"), callback_data=f"get"),
+            ],
+        ]
+    )
+    return markup
+
+
+async def back_to():
+    markup = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text=_("🔙 Orqaga"), callback_data=f"back"),
+            ],
+        ]
+    )
+    return markup
+
+
+async def month_keyboards():
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton('January', callback_data='01'),
+             InlineKeyboardButton('February', callback_data='02'),
+             InlineKeyboardButton('March', callback_data='03'),
+             InlineKeyboardButton('April', callback_data='04')],
+
+            [InlineKeyboardButton('May', callback_data='05'),
+             InlineKeyboardButton('June', callback_data='06'),
+             InlineKeyboardButton('July', callback_data='07'),
+             InlineKeyboardButton('August', callback_data='08')],
+
+            [InlineKeyboardButton('September', callback_data='09'),
+             InlineKeyboardButton('October', callback_data='10'),
+             InlineKeyboardButton('November', callback_data='11'),
+             InlineKeyboardButton('December', callback_data='12')],
+
+            [InlineKeyboardButton("◀️Back", callback_data="back")]
+        ])
+    return keyboard
+
+
 async def menu_button(lang):
     main_menu_uz = ['Mahsulotlar', "Narxlar ro'yxatini yuklab olish", "F.A.Q", "Biz haqimizda", "Biz bilan bog'lanish ",
                     "Tilni o'zgartirish"]
