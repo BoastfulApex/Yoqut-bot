@@ -10,10 +10,10 @@ plus_minus_data = CallbackData("PS", "key", "purchase_id")
 async def menu_keyboard():
     markup = InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text=_("Tovar yaratish"), callback_data="add_product")],
-            [InlineKeyboardButton(text=_("Skladga tovar olib kirish"), callback_data="add_to_storage")],
-            [InlineKeyboardButton(text=_("Skladdagi tovarni sotish"), callback_data="sell_from_storage")],
-            [InlineKeyboardButton(text=_("Sklad"), callback_data="storage")],
+            [InlineKeyboardButton(text=_("🆕 Tovar yaratish"), callback_data="add_product")],
+            [InlineKeyboardButton(text=_("⏬ Skladga tovar olib kirish"), callback_data="add_to_storage")],
+            [InlineKeyboardButton(text=_("❎ Skladdagi tovarni sotish"), callback_data="sell_from_storage")],
+            [InlineKeyboardButton(text=_("🈁 Sklad"), callback_data="storage")],
         ]
     )
     return markup
@@ -64,13 +64,13 @@ async def storage_keyboard():
 async def storage_menu():
     markup = InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text=_("Skladdagi tovarlarni ko'rish"), callback_data="products_in_storage")],
-            [InlineKeyboardButton(text=_("Shu hafta uchun savdoni ko'rish"), callback_data="sells_in_this_week")],
-            [InlineKeyboardButton(text=_("Oy uchun savdoni ko'rish"), callback_data="sells_in_month")],
-            [InlineKeyboardButton(text=_("Shu oy uchun savdoni ko'rish"), callback_data="sells_in_this_month")],
-            [InlineKeyboardButton(text=_("Tovar nomi bo'yicha savdoni ko'rish"), callback_data="sells_by_product")],
-            [InlineKeyboardButton(text=_("Kunlik savdoni ko'rish"), callback_data="sells_in_day")],
-            [InlineKeyboardButton(text=_("Kategoriya bo'yicha tovarlar"), callback_data="product_by_category")],
+            [InlineKeyboardButton(text=_("✅ Skladdagi tovarlarni ko'rish"), callback_data="products_in_storage")],
+            [InlineKeyboardButton(text=_("🗓 Shu hafta uchun savdoni ko'rish"), callback_data="sells_in_this_week")],
+            [InlineKeyboardButton(text=_("🗓 Oy uchun savdoni ko'rish"), callback_data="sells_in_month")],
+            [InlineKeyboardButton(text=_("🗓 Shu oy uchun savdoni ko'rish"), callback_data="sells_in_this_month")],
+            [InlineKeyboardButton(text=_("❇️Tovar nomi bo'yicha savdoni ko'rish"), callback_data="sells_by_product")],
+            [InlineKeyboardButton(text=_("📅 Kunlik savdoni ko'rish"), callback_data="sells_in_day")],
+            [InlineKeyboardButton(text=_("🗂 Kategoriya bo'yicha tovarlar"), callback_data="product_by_category")],
             [InlineKeyboardButton(text=_("🔙 Orqaga"), callback_data=f"back_main")],
         ]
     )

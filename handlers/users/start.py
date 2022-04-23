@@ -112,7 +112,9 @@ async def get_category(call: types.CallbackQuery, state: FSMContext):
 async def get_product(call: types.CallbackQuery, state: FSMContext):
     product_id = call.data
     await state.update_data(product_id=product_id)
-    await bot.send_message(chat_id=call.from_user.id, text="Tovar sonini kiriting")
+    product = await commands.get_product(int(product_id))
+    text = f"Tovar: <b>{product.unique_name}</b>\n"
+    await call.message.edit_text(text=_(text))
     await state.set_state('get_product_count')
 
 
@@ -169,7 +171,10 @@ async def storage_product(call: types.CallbackQuery, state: FSMContext):
     call_data = call.data
     print(call_data)
     await state.update_data(storage_id=call_data)
-    await call.message.edit_text(text="Maxssulot sonini kiriting")
+    product_stor = await commands.get_storage_product(int(call_data))
+    text = f"Tovar: <b>{product_stor.product.unique_name}</b>\n" \
+           f"Skladda mavjud miqdor: <b>{product_stor.count}</b>"
+    await call.message.edit_text(text=_(text))
     await state.set_state("get_storage_count")
 
 
@@ -180,7 +185,8 @@ async def get_storage_count(message: types.Message, state: FSMContext):
         data = await state.get_data()
         product_storage = await commands.get_storage_product(int(data["storage_id"]))
         if product_count > product_storage.count:
-            await message.answer(text='Tovar sonini qaytadan kiriting')
+            await message.answer(text='⚠️Skladda kerakli miqdor mavjud emas.\n'
+                                      'Qaytadan kiring')
             await state.set_state('get_storage_count')
         else:
             markup = await confirm_keyboard()
@@ -285,7 +291,7 @@ async def grt_storage_command(call: types.CallbackQuery, state: FSMContext):
                            'Chiqish narxi': chiqim,
                            'Soni': soni,
                            'Sana': sana,
-                           'Jami': jami,})
+                           'Jami': jami, })
         df.to_excel('./xisobot.xlsx')
         await call.message.edit_text(text=_(text), reply_markup=markup)
         await state.set_state("get_or_back")
@@ -322,7 +328,7 @@ async def grt_storage_command(call: types.CallbackQuery, state: FSMContext):
                            'Chiqish narxi': chiqim,
                            'Soni': soni,
                            'Sana': sana,
-                           'Jami': jami,})
+                           'Jami': jami, })
         df.to_excel('./xisobot.xlsx')
         await call.message.edit_text(text=_(text), reply_markup=markup)
         await state.set_state("get_or_back")
@@ -361,7 +367,7 @@ async def grt_storage_command(call: types.CallbackQuery, state: FSMContext):
                            'Chiqish narxi': chiqim,
                            'Soni': soni,
                            'Sana': sana,
-                           'Jami': jami,})
+                           'Jami': jami, })
         df.to_excel('./xisobot.xlsx')
         await call.message.edit_text(text=_(text), reply_markup=markup)
         await state.set_state("get_or_back")
@@ -385,7 +391,7 @@ async def get_sell_category(call: types.CallbackQuery, state: FSMContext):
             sells.append(i)
     text = ''
     if len(sells) == 0:
-        await call.answer(text=_("Tanlangan oy bo'sh\nQaytadan tanlang"), show_alert=True)
+        await call.answer(text=_("❌ Tanlangan oy bo'sh\n Qaytadan tanlang"), show_alert=True)
     else:
         os.remove("./xisobot.xlsx")
         nomi = []
@@ -429,7 +435,7 @@ async def get_month(call: types.CallbackQuery, state: FSMContext):
                 sells.append(i)
         text = ''
         if len(sells) == 0:
-            await call.answer(text=_("Tanlangan oy bo'sh\nQaytadan tanlang"), show_alert=True)
+            await call.answer(text=_("❌ Tanlangan oy bo'sh\n Qaytadan tanlang"), show_alert=True)
             await state.set_state("get_month")
         else:
             os.remove("./xisobot.xlsx")
