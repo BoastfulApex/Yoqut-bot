@@ -10,10 +10,10 @@ plus_minus_data = CallbackData("PS", "key", "purchase_id")
 async def menu_keyboard():
     markup = InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text=_("🆕 Tovar yaratish"), callback_data="add_product")],
-            [InlineKeyboardButton(text=_("⏬ Skladga tovar olib kirish"), callback_data="add_to_storage")],
-            [InlineKeyboardButton(text=_("❎ Skladdagi tovarni sotish"), callback_data="sell_from_storage")],
-            [InlineKeyboardButton(text=_("🈁 Sklad"), callback_data="storage")],
+            [InlineKeyboardButton(text=_("Tovar yaratish 🆕"), callback_data="add_product")],
+            [InlineKeyboardButton(text=_("Omborxonaga tovarni qo'shish ➕"), callback_data="add_to_storage")],
+            [InlineKeyboardButton(text=_("Ombroxonadagi tovarni sotish 💸"), callback_data="sell_from_storage")],
+            [InlineKeyboardButton(text=_("Omborxona 📂"), callback_data="storage")],
         ]
     )
     return markup
@@ -31,6 +31,15 @@ async def category_keyboard():
 
 async def product_keyboard():
     products = await get_products()
+    inline_keyboard = []
+    for i in products:
+        inline_keyboard.append([InlineKeyboardButton(text=i.unique_name, callback_data=i.id)])
+
+    markup = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
+    return markup
+
+
+async def products_by_name(products):
     inline_keyboard = []
     for i in products:
         inline_keyboard.append([InlineKeyboardButton(text=i.unique_name, callback_data=i.id)])
@@ -103,24 +112,35 @@ async def back_to():
 async def month_keyboards():
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton('January', callback_data='01'),
-             InlineKeyboardButton('February', callback_data='02'),
-             InlineKeyboardButton('March', callback_data='03'),
-             InlineKeyboardButton('April', callback_data='04')],
+            [InlineKeyboardButton('Yanvar', callback_data='01'),
+             InlineKeyboardButton('Favral', callback_data='02'),
+             InlineKeyboardButton('Mart', callback_data='03'),
+             InlineKeyboardButton('Aprel', callback_data='04')],
 
             [InlineKeyboardButton('May', callback_data='05'),
-             InlineKeyboardButton('June', callback_data='06'),
-             InlineKeyboardButton('July', callback_data='07'),
-             InlineKeyboardButton('August', callback_data='08')],
+             InlineKeyboardButton('Iyun', callback_data='06'),
+             InlineKeyboardButton('Iyul', callback_data='07'),
+             InlineKeyboardButton('Avgust', callback_data='08')],
 
-            [InlineKeyboardButton('September', callback_data='09'),
-             InlineKeyboardButton('October', callback_data='10'),
-             InlineKeyboardButton('November', callback_data='11'),
-             InlineKeyboardButton('December', callback_data='12')],
+            [InlineKeyboardButton('Sentabr', callback_data='09'),
+             InlineKeyboardButton('Oktyabr', callback_data='10'),
+             InlineKeyboardButton('Noyabr', callback_data='11'),
+             InlineKeyboardButton('Dekabr', callback_data='12')],
 
             [InlineKeyboardButton("◀️Back", callback_data="back")]
         ])
     return keyboard
+
+
+async def back_menu():
+    markup = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text=_("🔙 Bosh menuga qaytish"), callback_data=f"back_to_menu)"),
+            ],
+        ]
+    )
+    return markup
 
 
 async def menu_button(lang):

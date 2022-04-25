@@ -7,7 +7,7 @@ from aiogram.dispatcher.filters.builtin import CommandStart
 
 # from utils.db_api.database import get_faq, get_price_list, get_about_us, get_user
 from keyboards.inline.main_inline import menu_keyboard, category_keyboard, product_keyboard, confirm_keyboard, \
-    storage_keyboard, storage_menu, get_or_back, month_keyboards, back_to
+    storage_keyboard, storage_menu, get_or_back, month_keyboards, back_to, back_menu, products_by_name
 from loader import dp, _, bot
 from utils.db_api import database as commands
 
@@ -30,7 +30,9 @@ async def check_password(message: types.Message, state: FSMContext):
     if pas == password:
         await message.delete()
         markup = await menu_keyboard()
-        await bot.send_message(chat_id=message.from_user.id, text="Parol tog'ri\nBosh menyuga xush kelibsiz",
+        await bot.send_message(chat_id=message.from_user.id,
+                               text="Siz bosh menyudasiz. Iltimos pastdagi tugmalar orqali o'zingizga kerakli "
+                                    "yo'nalishni tanlang 👇",
                                reply_markup=markup)
         await state.set_state('menu')
     else:
@@ -45,7 +47,8 @@ async def menu(call: types.CallbackQuery, state: FSMContext):
     command = call.data
 
     if command == 'add_product':
-        await call.message.edit_text(text='Tovar maxsus raqamini kiriting')
+        markup = await back_menu()
+        await call.message.edit_text(text='Tovar uchun maxsus nom bering ✏️', reply_markup=markup)
         await state.set_state('get_name')
     elif command == 'add_to_storage':
         markup = await product_keyboard()
@@ -53,7 +56,7 @@ async def menu(call: types.CallbackQuery, state: FSMContext):
         await state.set_state('get_product')
     elif command == "sell_from_storage":
         markup = await storage_keyboard()
-        await call.message.edit_text(text='Tovar tanlang', reply_markup=markup)
+        await call.message.edit_text(text='Omborxonadagi mavjud tovarlardan birini tanlang 👇', reply_markup=markup)
         await state.set_state('get_product_from_storage')
     elif command == "storage":
         markup = await storage_menu()
@@ -64,20 +67,24 @@ async def menu(call: types.CallbackQuery, state: FSMContext):
 @dp.message_handler(content_types=types.ContentType.TEXT, state="get_name")
 async def get_serial_name(message: types.Message, state: FSMContext):
     serial_name = message.text
-    await message.answer(text="Kirim narxini kiriting")
+    markup = await back_menu()
+    await message.answer(text="Tovarning boshlang'ich narxini kiriting 💸 \nMisol uchun: 10000", reply_markup=markup)
     await state.update_data(serial_name=serial_name)
     await state.set_state('get_first_cost')
 
 
 @dp.message_handler(content_types=types.ContentType.TEXT, state="get_first_cost")
 async def get_first_cost(message: types.Message, state: FSMContext):
+    markup = await back_menu()
     try:
         first_cost = int(message.text)
-        await message.answer(text="Chiqim narxini kiriting")
+        await message.answer(text="Tovarning sotilish narxini kiriting 💸\nMisol uchun: 12000", reply_markup=markup)
         await state.update_data(first_cost=first_cost)
         await state.set_state('get_last_cost')
     except:
-        await message.answer(text='Kirim narxini qaytadan kiriting:')
+        await message.answer(
+            text='❌ Xatolik!\nTovarning boshlang\'ich narxini qaytadan kiriting 💸 \nMisol uchun: 10000',
+            reply_markup=markup)
         await state.set_state('get_first_cost')
 
 
@@ -86,12 +93,14 @@ async def get_last_cost(message: types.Message, state: FSMContext):
     try:
         first_cost = int(message.text)
         markup = await category_keyboard()
-        await message.answer(text="Tovar kategoriyasini tanlang", reply_markup=markup)
+        await message.answer(text="Tovarning kategoriyasini tanlang 👇", reply_markup=markup)
         await state.update_data(last_cost=first_cost)
         await state.set_state('get_category')
     except Exception as ex:
+        markup = await back_menu()
         print(ex)
-        await message.answer(text='Chiqim narxini qaytadan kiriting:')
+        await message.answer(text="❌ Xatolik!\nTovarning sotilish narxini qaytadan kiriting 💸\nMisol uchun: 12000",
+                             reply_markup=markup)
         await state.set_state('get_last_cost')
 
 
@@ -103,9 +112,26 @@ async def get_category(call: types.CallbackQuery, state: FSMContext):
     await commands.add_product(unique_name=data['serial_name'], kirish_narxi=int(data['first_cost']),
                                chiqish_narxi=int(data['last_cost']), category=category)
     markup = await menu_keyboard()
-    await call.message.edit_text(text="Tovar qo'shildi\nBosh menyu",
-                                 reply_markup=markup)
+    await call.message.edit_text(text="Tovar muvoffaqiyatli yaraldi ✅")
+    await bot.send_message(chat_id=call.from_user.id,
+                           text="Siz bosh menyudasiz. Iltimos pastdagi tugmalar orqali o'zingizga "
+                                "kerakli yo'nalishni tanlang 👇", reply_markup=markup)
     await state.set_state('menu')
+
+
+@dp.message_handler(state="get_product")
+async def get_product_by_name(message: types.Message, state: FSMContext):
+    text = message.text
+    print(text)
+    prd = await commands.get_products()
+    products = []
+    for i in prd:
+        if i.unique_name.startswith(f"{text}"):
+            products.append(i)
+    markup = await products_by_name(products)
+
+    await bot.send_message(chat_id=message.from_user.id, text='Tovar tanlang', reply_markup=markup)
+    await state.set_state('get_product')
 
 
 @dp.callback_query_handler(state="get_product")
@@ -113,7 +139,11 @@ async def get_product(call: types.CallbackQuery, state: FSMContext):
     product_id = call.data
     await state.update_data(product_id=product_id)
     product = await commands.get_product(int(product_id))
-    text = f"Tovar: <b>{product.unique_name}</b>\n"
+    text = f"🆔 Tovar: <b>{product.unique_name}</b>\n" \
+           f"💬 Kategoriyasi: <b>{product.category}</b>\n" \
+           f"💳 Kirim narxi:  <b>{product.kirish_narxi}</b>\n" \
+           f"💲 Chiqim narxi: <b>{product.chiqish_narxi}</b>\n\n" \
+           f"Bu tovardan qancha miqdorda qo'shmoqchisiz? \nMisol uchun: 100"
     await call.message.edit_text(text=_(text))
     await state.set_state('get_product_count')
 
@@ -125,9 +155,9 @@ async def get_product_count(message: types.Message, state: FSMContext):
         data = await state.get_data()
         product = await commands.get_product(data["product_id"])
         markup = await confirm_keyboard()
-        text = f"Tovar: <b>{product.unique_name}</b>\n" \
-               f"Soni: <b>{product_count}</b>\n\n" \
-               f"Haqiqatdan skladga qo'shishni istaysizmi"
+        text = f"🆔 Tovar: <b>{product.unique_name}</b>\n" \
+               f"🔢 Soni: <b>{product_count}</b>\n\n" \
+               f"Iltimos tovar qo'shish uchun rozilik bering 👇"
         await message.answer(text=_(text), reply_markup=markup)
         await state.update_data(product_count=product_count)
         await state.set_state('confirm_add')
@@ -155,8 +185,10 @@ async def confirm_add(call: types.CallbackQuery, state: FSMContext):
         else:
             await commands.add_Storage(product=product, count=int(data_state["product_count"]))
         markup = await menu_keyboard()
-        await call.message.edit_text(text="Tovar skladga qo'shildi\n\nBosh menyu",
-                                     reply_markup=markup)
+        await call.message.edit_text(text="Tovar omborxonaga muvoffaqiyatli qo'shildi ✅")
+        await bot.send_message(chat_id=call.from_user.id,
+                               text="Siz bosh menyudasiz. Iltimos pastdagi tugmalar orqali "
+                                    "\o'zingizga kerakli yo'nalishni tanlang 👇", reply_markup=markup)
         await state.set_state("menu")
 
     elif data == "cancel":
@@ -172,8 +204,11 @@ async def storage_product(call: types.CallbackQuery, state: FSMContext):
     print(call_data)
     await state.update_data(storage_id=call_data)
     product_stor = await commands.get_storage_product(int(call_data))
-    text = f"Tovar: <b>{product_stor.product.unique_name}</b>\n" \
-           f"Skladda mavjud miqdor: <b>{product_stor.count}</b>"
+    text = f"🆔 Tovar: <b>{product_stor.product.unique_name}</b>\n" \
+           f"💬 Kategoriyasi: <b>{product_stor.product.category}</b>\n" \
+           f"💳 Kirim narxi:  <b>{product_stor.product.kirish_narxi}</b>\n" \
+           f"💲 Chiqim narxi::  <b>{product_stor.product.chiqish_narxi}</b>\n" \
+           f"🔢 Qoldiq: <b>{product_stor.count}</b>"
     await call.message.edit_text(text=_(text))
     await state.set_state("get_storage_count")
 
@@ -185,14 +220,14 @@ async def get_storage_count(message: types.Message, state: FSMContext):
         data = await state.get_data()
         product_storage = await commands.get_storage_product(int(data["storage_id"]))
         if product_count > product_storage.count:
-            await message.answer(text='⚠️Skladda kerakli miqdor mavjud emas.\n'
-                                      'Qaytadan kiring')
+            await message.answer(text='Skladda kerakli miqdor mavjud emas ⚠️\n'
+                                      'Iltimos qaytadan kiriting ✒️')
             await state.set_state('get_storage_count')
         else:
             markup = await confirm_keyboard()
-            text = f"Tovar: <b>{product_storage.product.unique_name}</b>\n" \
-                   f"Soni: <b>{product_count}</b>\n\n" \
-                   f"Haqiqatdan skladdan chiqarinshni istaysizmi"
+            text = f"🆔 Tovar: <b>{product_storage.product.unique_name}</b>\n" \
+                   f"🔢 Soni: <b>{product_count}</b>\n\n" \
+                   f"Iltimos tovar sotish uchun rozilik bering 👇"
             await message.answer(text=_(text), reply_markup=markup)
             await state.update_data(product_count=product_count)
             await state.set_state('confirm_sell')
@@ -238,8 +273,8 @@ async def grt_storage_command(call: types.CallbackQuery, state: FSMContext):
         tr = []
         os.remove("./xisobot.xlsx")
         for i in storage:
-            text += f"{k}) Tovar: <b>{i.product.unique_name}</b>\n" \
-                    f"Soni: <b>{i.count}</b>\n" \
+            text += f"{k}) 🆔 Tovar:: <b>{i.product.unique_name}</b>\n" \
+                    f"🔢 Soni: <b>{i.count}</b>\n" \
                     f"<b>---------------------------------</b>\n"
             kirim.append(i.product.kirish_narxi)
             nomi.append(i.product.unique_name)
@@ -526,3 +561,12 @@ async def get_file(call: types.CallbackQuery, state: FSMContext):
         await call.message.delete()
         await bot.send_message(chat_id=call.from_user.id, text='Kerakli buyruqni tanlang', reply_markup=markup)
         await state.set_state('get_storage_command')
+
+
+@dp.callback_query_handler(lambda call: call.data.startswith("back_to_menu"), state="*")
+async def back_to_menu(call: types.CallbackQuery, state: FSMContext):
+    await state.finish()
+    markup = await menu_keyboard()
+    await call.message.edit_text("Siz bosh menyudasiz. Iltimos pastdagi tugmalar orqali o'zingizga kerakli "
+                                 "\yo'nalishni tanlang 👇", reply_markup=markup)
+    await state.set_state("menu")
